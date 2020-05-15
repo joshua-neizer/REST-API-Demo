@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="index.css" rel="stylesheet">
+        <link rel="icon" href="icon.png" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500&display=swap" rel="stylesheet">
+        <title>&#8226; API &#8226;</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://rawgit.com/thielicious/selectFile.js/master/selectFile.js"></script>
+        <script>
+            function glow(){
+                window.setInterval( function(){
+                    if( document.getElementById("fileToUpload").files.length != 0 ){
+                        document.getElementById("glow").style.boxShadow = "-2px 2px 0px 3px wheat";
+                        document.getElementById("glow").style.border = "solid 1px wheat";
+                        document.getElementById("glow").style.color = "wheat";
+                    }
+                }, 500)}
+
+                var getFile = new selectFile;
+                getFile.targets('fileToUpload','selected');
+        </script>
+    </head>
+    <body onload="glow()">
+        <div class="space"></div>
+        <h1>API DEMO</h1>
+        <p class="header">Choose an image to upload</p>
+        <br>
+        <div class="container">
+            <form action=".upload.php" method="post" enctype="multipart/form-data">
+                <input type="file" name="fileToUpload" id="fileToUpload" hidden>
+                <input type='file' hidden id='fileToUpload'>
+                <input type=button onClick=getFile.simulate() value='Choose Files'>
+                <div class="up"><label id='selected'>Nothing selected</label></div>
+                <div style="margin-top: 30px;">
+                    <label for="fname" style="font-size: 25px; font-weight: bold;">Descriptor</label>
+                    <input type="text" id="fname" name="desc" placeholder="portrait">           
+                </div>
+                <div class="space"></div>
+                <input id="glow" type="submit" value="Upload Image" name="submit" multiple>
+            </form>            
+        </div>
+
+        <div style="padding: 30px;"></div>
+        <a href="repository.php"><button class="repository">Repository</button></a>
+        <div class="space"></div>
+    </body>
+</html>
