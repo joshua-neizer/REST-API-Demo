@@ -17,6 +17,9 @@
         <h1>API DEMO</h1>
         <p class="results">
             <?php
+                require __DIR__ . '/vendor/autoload.php';
+                use Google\Cloud\Vision\V1\ImageAnnotatorClient;
+
                 function console_log($output, $with_script_tags = true) {
                     $js_code = 'console.log(' . json_encode($output, JSON_HEX_TAG) . 
                 ');';
@@ -26,12 +29,38 @@
                     echo $js_code;
                 }
 
+                function GoogleVision($fileName) {                
+                    # [START vision_quickstart]
+                    # includes the autoloader for libraries installed with composer
+                    
+                    putenv('GOOGLE_APPLICATION_CREDENTIALS=/home/pi/code/REST API-fbfd880db2b2.json');
+                    # instantiates a client
+                    $imageAnnotator = new ImageAnnotatorClient();
+                
+                
+                    # prepare the image to be annotated
+                    $image = file_get_contents($fileName);
+                
+                    # performs label detection on the image file
+                    $response = $imageAnnotator->labelDetection($image);
+                    $labels = $response->getLabelAnnotations();
+                
+                    $array = [];
+                
+                    if ($labels) {
+                        foreach ($labels as $label) {
+                            array_push($array, strtolower(rtrim($label->getDescription() . PHP_EOL)));
+                        }
+                    } else {
+                        echo('No label found' . PHP_EOL);
+                    }
+                    return $array;
+                }
+
                 $target_dir = "uploads/";
                 $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-                $descriptor = $_POST['desc'];
-                $descriptor = ($descriptor == "") ? "miscellaneous" : strtolower(explode(" ", $descriptor) [0]);
 
-                console_log($descriptor);
+                
                 $uploadOk = 1;
                 $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
@@ -75,11 +104,22 @@
                     if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
                         echo "<b>Complete</b> The file uploaded";
                         console_log("COMPLETE: The file " . basename($_FILES["fileToUpload"]["name"]). " has been uploaded.");
+
+                        $labels = GoogleVision($target_file);
+                        
+                        $description = $_POST['desc'];
+                        $description = strtolower(explode(" ", $description) [0]);
+                        // console_log($description);
+                        // console_log(array_unshift($description, $labels));
+                        // console_log(array($description, $labels));
+                        ($description != "") ? array_unshift($labels, $description) : false;
+                        $labels = implode(" ", $labels);
+                        // console_log($labels);
                         // The data to send to the API
                         $postData = array(
                             'file_name' => basename($_FILES["fileToUpload"]["name"]),
                             'size' => $_FILES["fileToUpload"]["size"].'KB',
-                            'descriptor' => $descriptor
+                            'descriptor' => $labels
                         );
 
                         console_log(json_encode($postData));
@@ -90,7 +130,7 @@
                             'http' => array(
                                 // http://www.php.net/manual/en/context.http.php
                                 'method' => 'POST',
-                                'header' => "Authorization: {$authToken}\r\n".
+                                'header' => "Authorization: {}\r\n".
                                     "Content-Type: application/json\r\n",
                                 'content' => json_encode($postData)
                             )
