@@ -212,11 +212,10 @@ $('.download').click(function () {
 // When the clear button is pressed, all of the selected images are unselected
 $('.clear').click(function () {
     counter = 0;
-    console.log(select)
     for (var photo in select) {
 
         $('#' + photo).css('border', '0px solid dodgerblue');
-        $('#' + photo).css('width', '300px');
+        $('#' + photo).css('width', display[1]);
         delete select[photo];
     }
 
@@ -261,8 +260,7 @@ slider.oninput = function() {
     display [2] = (+this.value + +150) + 'px';
     display [3] = this.value;
     display [4] = this.value + 150;
-    scale();
-        
+    scale();        
 }
 
 // The initiliazed function is called; function must wait for the server to confirm GET request
